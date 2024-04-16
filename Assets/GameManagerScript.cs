@@ -9,75 +9,74 @@ public class GameManagerScript : MonoBehaviour
     int[] map;  //int配列のクラス----
 
     // Start is called before the first frame update--
-    void Start()
+
+    void PrintfArray()//-------------------------------
     {
-        //配列の作成と初期化------
-        map = new int[] { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
-
-        string debugText = "";   //文字列の宣言と初期化
-        for(int i=0; i<map.Length; i++)
+        string debugText = "";
+        for (int i = 0; i < map.Length; i++)
         {
-            //要素数をひとつずつ出力-----
-            // Debug.Log(map[i] + ",");
-
-            //文字列に結合していく
             debugText += map[i].ToString() + ",";
         }
         Debug.Log(debugText);
     }
 
-    // Update is called once per frame
-    void Update()
+    int GetPlayerIndex()//-------------------------------
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        for (int i = 0; i < map.Length; i++)
         {
-            int playerIndex = -1;
-            for(int i=0; i<map.Length; i++)
+            if (map[i] == 1)
             {
-                if (map[i] == 1)
-                {
-                    playerIndex = i;
-                    break;
-                }
+                return i;
             }
-            if (playerIndex < map.Length - 1)
-            {
-                map[playerIndex + 1] = 1;
-                map[playerIndex] = 0;
-            }
-            string debugText = "";
-            for(int i=0; i < map.Length; i++)
-            {
-                debugText += map[i].ToString() + ",";
-            }
-            Debug.Log(debugText);
         }
+        return -1;
+    }
 
-        //左移動---------------------------------
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+    bool MoveNumber(int number, int moveFrom, int moveTo)///-----------------
+    {
+
+        if (moveTo < 0 || moveTo >= map.Length) { return false; }
+
+        if (map[moveTo] == 2)
         {
-            int playerIndex = -1;
-            for(int i=0; i<map.Length; i++)
+            int velocity = moveTo - moveFrom;
+            bool success = MoveNumber(2, moveTo, moveTo + velocity);
+            if (!success) { return false; }
+        }
+        map[moveTo] = number;
+        map[moveFrom] = 0;
+        return true;
+    }
+    
+
+    void Start()//--------------------------------------------
+    {
+        //配列の作成と初期化------
+        map = new int[] { 0, 2, 0, 1, 0, 2, 0, 0, 0 };
+
+        string debugText = "";   //文字列の宣言と初期化
+        PrintfArray();
+    }
+        // Update is called once per frame
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                if (map[i] == 1)
-                {
-                    playerIndex = i;
-                    break;
-                }
+                //int playerIndex = -1;
+             int playerIndex = GetPlayerIndex();
+            MoveNumber(1, playerIndex, playerIndex + 1);
+            PrintfArray();
             }
 
-            if (playerIndex > 0)
+            //左移動---------------------------------
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                map[playerIndex - 1] = 1;
-                map[playerIndex] = 0;
-            }
+                int playerIndex = GetPlayerIndex();
 
-            string debugText = "";
-            for (int i = 0; i < map.Length; i++)
-            {
-                debugText += map[i].ToString() + ",";
+            MoveNumber(1, playerIndex, playerIndex - 1);
+            PrintfArray();
+
             }
-            Debug.Log(debugText);
         }
     }
-}
+
